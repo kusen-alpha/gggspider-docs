@@ -4,7 +4,7 @@
 
 微信: hu1194542196
 
-github: https://github.com/kusen-alpha/
+github: <https://github.com/kusen-alpha/>
 
 # 合作交流
 
