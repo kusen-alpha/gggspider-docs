@@ -1,96 +1,161 @@
 # 任务标准
+
+总结日常采集所需要的一些字段，项目中可根据实际情况进行选择相应字段和类型，这里只是做一个参考。
+
 ## task标准
-```
-{
-    'id': '',  # 任务id
-    'parentId': '',  # 父任务id
-    'type': '',  # 任务类型,普通任务/多媒体下载任务
-    'executeType': '',  # 一次性任务/常态化任务
-    'status': '',  # 任务状态
-    'sourceTasks': [],  # 来源任务
-    'spiderId': '',  # 采集器id
-    'spiderType': 'test',  # 采集器类别
-    'platformName': '',  # 平台名
-    'spiderName': 'test',  # 采集器名，spiderType+'/'+platformName
-    'spiderManagerName': '',  # 管理者采集器名
-    'spiderVersion': '',  # web/pc/api/app
-    'duplicateEnabled': True,  # 是否去重
-    'feedbackEnabled': False, # 是否需要反馈
-    'distributeCount': 3,  # 下发次数
-    'currentDistributeCount': 1, # 当前下发次数
-    'seed': {},  # 采集种子/信源
-    'createTs': '',  # 创建时间
-    'updateTs': '',  # 修改时间
-    'creator': '',  # 创建者
-    'updater': ''  # 修改者
-}
 
+|字段名|   功能    | 是否必须 |        类型        |  默认值   |             备注             |
+|:---:|:-------:|:----:|:----------------:|:------:|:--------------------------:|
+|id|  任务id   |  是   |    string/int    |||
+|parentId|  父任务id  |  否   |    string/int    |  null  |           子任务时设置           |
+|type|  任务类型   |  否   |      string      |  text  |   text(普通任务)/file(多媒体下载任务  |
+|executeType| 执行任务类型  |  否   |      string      | always |  once(一次性任务)/always(常态化任务) |
+|status|  任务状态   |  否   |       int        |   0    |                            |
+|sourceTasks|  来源任务   |  否   |      array       |  null  |                            |
+|spiderId|  采集器id  |  否   |       int        |  null  |                            |
+|spiderType|  采集器类别  |  否   |      string      |  null  |                            |
+|platformName|   平台名   |  否   |      string      |  null  |                            |
+|spiderName|  采集器名   |  是   |      string      |        | spiderType+'/'+platformName |
+|spiderManagerName| 管理者采集器名 |  否   |      string      |  null  |                            |
+|spiderVersion|  采集器版本  |  否   |      string      |  null  |                            |
+|duplicateEnabled|  是否去重  |  否   |     boolean      | False  |                            |
+|feedbackEnabled|  是否需要反馈  |  否   |     boolean      | False  |                            |
+|distributeCount|  下发次数  |  否   |       int        |   3    |                            |
+|currentDistributeCount|  当前下发次数  |  否   |       int        |   1    |                            |
+|createTs|  创建时间  |  否   |       int        |       |           毫秒            |
+|updateTs|  修改时间  |  否   |       int        |       |           毫秒            |
+|creator|  创建者  |  否   |      string      |       |                       |
+|updater|  修改者  |  否   |      string      |       |                       |
+|seed|  采集种子/信源  |  是   | object(map/dict) |       |                       |
 
-```
 ## seed标准
+
+|            字段名            |               功能               | 是否必须 |        类型        |            默认值             |             备注             |
+|:-------------------------:|:------------------------------:|:----:|:----------------:|:--------------------------:|:--------------------------:|
+|            id             |            信源/种子id             |  是   |    string/int    |         string/int         ||
+|          channel          |              通道号               |  否   |       int        |||
+|          siteId           |              网站id              |  否   |    string/int    |||
+|         siteName          |              网站名称              |  否   |      string      |||
+|         boardType         |              板块类别              |  否   |      string      |||
+|          boardId          |              板块id              |  否   |    string/int    |||
+|       customBoardId       |            自定义板块id             |  否   |    string/int    |||
+|         boardName         |              板块名称              |  否   |      string      |||
+|       subBoardName        |             子板块名称              |  否   |      string      |||
+|         boardUrl          |             板块url              |  否   |      string      |||
+|         startUrl          |             起始url              |  是   |      string      |||=
+|       requestKwargs       |             起始请求参数             |  否   | object(map/dict) |||
+|         fileUrls          |            文件url列表             |  否   |      array       |||
+|         filePaths         |         文件url对应存储路径列表          |  否   |      array       |||
+|          appends          |             透传其他参数             |  否   | object(map/dict) |||
+|         encoding          |               编码               |  否   |      string      |||
+|         language          |               语言               |  否   |      string      |||
+|         priority          |              优先级               |  否   |       int        |||
+|         location          |               地区               |  否   |      string      |||
+|          domain           |               域名               |  否   |      string      |||
+|       customDomain        |             自定义域名              |  否   |      string      |||
+|       allowDomains        |             允许域名列表             |  否   |      array       |||
+|        timeFormats        |            时间解析格式列表            |  否   |      array       |||
+|        crawlTypes         |             爬取类别列表             |  否   |      array       |||
+|       crawlPageNum        |              爬取页码              |  否   |       int        |||
+|        crawlCount         |              爬取数量              |  否   |       int        |||
+|        crawlDepth         |              爬取深度              |  否   |       int        |||
+|        retryCount         |              重试次数              |  否   |       int        |||
+|           delay           |              请求延迟              |  否   |       int        |||
+|          timeout          |             请求超时时间             |  否   |       int        |||
+|         resources         |              资源信息              |  否   | object(map/dict) |||
+|      resourceConfigs      |             资源信息配置             |  否   | object(map/dict) |||
+|       crawlStartTs        |            爬取范围起始时间            |  否   |       int        |||
+|        crawlEndTs         |            爬取范围结束时间            |  否   |       int        |||
+|     multimediaMarkup      |          文本是否进行多媒体标记           |  否   |     boolean      |||
+| multimediaDownloadUnified | 是否使用统一下载 |  否   |        boolean          || 统一下载时将spiderName取为默认Spider |
+|    multimediaDownload     |           多媒体是否下载配置            |  否   | object(map/dict) |||
+|       parseConfigs        |             解析规则配置             |  否   | object(map/dict) |||
+|       persistConfigs        |             持久化配置              |  否   | object(map/dict) |||
+|       spreadEabled        |            是否开启多级传播            |  否   |     boolean      |||
+|       spreadBasis        |             多级传播基准             |  否   |      array       |||
+|       spreadBasisSourceTypes        |           多级传播基准来源类别           |  否   |      array       |||
+|       spreadCrawlTypes        |           多级传播采集的类型            |  否   |      array       |||
+
++ __requestKwargs__
+
 ```
-{
-    'channel': '',
-    'siteId': '',
-    'siteName': '',
-    'boardType': '',
-    'boardId': '',
-    'customBoardId': '',
-    'boardName': '',
-    'subBoardName': '',
-    'boardUrl': '',
-    'startUrl': 'https://www.baidu.com',
-    "requestKwargs": {
+"requestKwargs": {  # 初始请求参数
         "className": "",
         "url": "",
         "method": "",
         "headers": {},
         "cookies": {},
         "body": {}
-    },
-    "fileUrls": [],  # 文件url列表
-    "filePaths": [],  # 文件url对应的本地路径列表
-    'appends': {},
-    'encoding': '',
-    'language': '',
-    'priority': '',
-    'location': '',
-    'domain': 'xxx.com',
-    'customDomain': '',
-    'allowDomains': '',
-    'timeFormats': '',
-    'crawlTypes': '',
-    'crawlPageNum': '',
-    'crawlCount': '',
-    'crawlDepth': '',  #爬取深度/多级传播深度
-    'retryCount': '',
-    'delay': '',
-    'timeout': '',
-    'resources': {},
-    'resourceServiceConfigs': {},
-    'crawlStartTs': '',
-    'crawlEndTs': '',
-    'multimediaMarkup': False,  # 文本是否进行多媒体标记
-    'multimediaDownloadUnified': True, # 是否使用统一下载（子任务进行spiderName替换为父类）
+    }
+```
+
++ __multimediaDownload__
+
+```
     'multimediaDownload': {  # 多媒体下载细分控制
         "image": True,
         "video": True,
         "file": True,
         "audio": True,
-    },
-    'parseConfigOrRules': { },
-    },
-    'persistConfigs': {
-    },
-    'spreadEabled':True # 开启多级传播
-    'spreadBasis':['user' ] # 多级传播基准
-    'spreadBasisSourceTypes':['follow','follower']  # 多级传播基准来源类别
-    'spreadCrawlTypes':['user', 'post', 'comment']  # 多级传播采集的类型
-}
+    }
 ```
-# 多场景启动
 
 # 任务生命周期
+
+## 信源存储
+
+信源/种子，是最原始的采集目标，它们一般是不会或不需要频繁变更的数据，一般保存在结构化数据库中。
+
+信源在表设计时，需要考虑以下几点：
+
++ 信源优先级，每个优先级的信源的采集周期应该是不一样的，是采集及时性和采集资源的综合考虑下确定的。
++ 信源表的分库分表，由于信源的增加，可能面临着信源表越来越大，影响查询修改效率。
+
+## 任务封装
+
+任务是直接面向采集的，信源和任务是一对多的关系，一个信源在一周采集周期内封装一个任务，然后放入任务队列。
+
+在任务封装时，需要单独有脚本去生成任务，实现方案有以下几种：
+
++ 实时地查询信源表，将达到采集时间点的信源推送进任务队列，并根据优先级对应的周期修改该信源下一次获取的时间点。
++ 利用定时任务，达到一个时间周期时将对应的优先级所有信源查询出并推送进任务队列。
+
+由于任务队列只是临时的任务数据，当需要一些后续业务的完整性，如统计任务采集情况，就必须将任务再持久化一份。
+
+## 任务队列
+
+任务队列是直接对接采集节点的，封装任务入采集队列是生产者，采集节点消费任务是消费者。
+
+任务队列在设计的时候，需要考虑如下几点：
+
++ 每个采集平台需要有对应的队列。
++ 每个采集平台的队列数可根据优先级来区分（优先级太对时也需要适当缩减队列数）
+
+## 采集消费
+采集节点统一从任务队列中进行消费（可以封装一个统一任务接口），采集节点理论上消费速度要比生产任务高，才不不会导致任务队列积压。
+
+采集消费时需要考虑如下几点：
++ 支持指定采集器任务，因为有一些采集平台特殊或需要单独部署时，需要一对一进行获取任务。
++ 支持混合任务，因为大部分采集节点都是是采集非特殊的采集平台任务。
++ 支持指定采集采集器任务且同时支持混合任务，在单独部署的采集环境里，当指定采集器任务取完后，为了避免服务器空闲，一般可获取混合任务。
+
+## 任务反馈
+在任务封装开始，就需要记录任务的状态，如：
++ 任务封装完毕
++ 采集节点获取完毕
++ 采集节点正常采集完毕
++ 采集节点异常采集完毕
++ 采集开发者指定设置任务状态
+
+根据任务状态，为应用层做一些更高级的需求。
+
+# 多场景启动
+
+## 任务接口设计
+
+## 启动脚本
+
+## 部署方案
 
 # Manager模式
 

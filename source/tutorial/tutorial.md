@@ -2,7 +2,7 @@
 
 此处使用Flask构建一个简易后端服务，应对采集所需，生产环境可以搭建更加复杂的后端服务接口。
 
-1. 采集目标接口
++ __采集目标接口__
 
 ```python
 import uuid
@@ -44,7 +44,7 @@ if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5555)
 ```
 
-2. 任务获取接口
++ __任务获取接口__
 
 ```python
 
@@ -76,7 +76,7 @@ app.add_url_rule('/crawler/tasks', view_func=TasksView.as_view('tasks'))
 
 ```
 
-3. 任务反馈接口
++ __任务反馈接口__
 
 ```python
 class TaskStats(views.MethodView):
@@ -96,7 +96,7 @@ app.add_url_rule(
 
 ```
 
-4. 数据推送接口
++ __数据推送接口__
 
 ```python
 class DataPersist(views.MethodView):
@@ -113,7 +113,7 @@ class DataPersist(views.MethodView):
 
 # 项目准备
 
-1. 构建项目
++ __构建项目__
 
 ```
 scrapy startproject test
@@ -121,7 +121,7 @@ cd test
 scrapy genspider test test.com
 ```
 
-2. 设置settings
++ __设置settings__
 
 ```
 ROBOTSTXT_OBEY = False
@@ -130,7 +130,7 @@ SPIDER_LOADER_CLASS = 'gggspider.spiderloader.SpiderLoader'
 
 # 请求解析
 
-1. 设计Item
++ __设计Item__
 
 ```python
 # items.py
@@ -149,7 +149,7 @@ class PostItem(DataItem):
     content = scrapy.Field(check_field=fields.StringCheckField())
 ```
 
-2. 编写Spider
++ __编写Spider__
 
 ```python
 # test.py
@@ -197,15 +197,15 @@ class TestSpider(Spider):
 
 # 数据持久化
 
-1. 本地持久化 
++ __本地持久化__ 
 
 根据task中的persists里的file字段进行配置保存本地储存的路径。
 
-2. 接口推送持久化
++ __接口推送持久化__
 
 根据task中的persists里的interface字段进行配置保存推送接口储存的地址。
 
-3. 配置
++ __配置__
 ```python
 ITEM_PIPELINES = {
     'gggspider.pipelines.persists.datas.file.DatasFilePipeline': 900,
@@ -215,7 +215,7 @@ ITEM_PIPELINES = {
 
 # 任务反馈
 
-1. 配置
++ __配置__
 
 根据task中的feedbackEnabled字段来控制是否进行反馈。
 ```python
@@ -228,7 +228,7 @@ ITEM_PIPELINES = {
 
 # 程序启动
 
-1. 编写启动脚本
++ __编写启动脚本__
 
 ```python
 # start_task.py
@@ -241,7 +241,7 @@ if __name__ == '__main__':
 
 ```
 
-2. 启动
++ __启动__
 
 ```
 python3 start_task.py
