@@ -21,6 +21,7 @@ gggspider（General General General Spider）通用采集框架，是基于scrap
 + scrapy框架中尽可能避免使用requests等同步请求库
 + 采集中尽可能不使用延迟操作,利用其他方案来实现，比如任务调度。
 + 尽可能杜绝直连数据库，推荐搭建高可用的接口来代替。
++ 采集器文件目录结构清晰，采集器名称和目录结构一一对应，参考任务标准。
 
 
 # 环境搭建
@@ -65,7 +66,7 @@ class TestSpider(Spider):
 from gggspider.commands import run
 
 
-def get_task(spider_name, count):
+def get_task(spider_name, count, spider_count, mixed):
     return [{
         'id': '1',
         'spiderName': 'test',

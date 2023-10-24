@@ -177,6 +177,7 @@
 def tasks():
     spider_name = request.args.get('spider_name')  # 采集器名，不指定则拿混合任务
     count = request.args.get('count')  # 数量
+    spider_count = request.args.get('spider_count')  # 采集器数量
     mixed = request.args.get('mixed')  # 是否支持混合，用于指定采集器名时
     # 获取任务逻辑......
 ```
@@ -187,27 +188,29 @@ def tasks():
 
 默认提供的脚本如下：
 
-|                  脚本                   | 功能 |说明| 
-|:-------------------------------------:|:---:|:---:|
-|       gggspider.command.run.py        | 单进程方式启动 || 
-|       gggspider.command.run.sh        | 单进程方式启动 || 
-| gggspider.command.run_multiprocess.py | 多进程方式启动 || 
-| gggspider.command.run_multiprocess.sh | 多进程方式启动 ||
+|                   脚本                   | 功能 |说明| 
+|:--------------------------------------:|:---:|:---:|
+|       gggspider.commands.run.py        | 单进程方式启动 || 
+|       gggspider.commands.run.sh        | 单进程方式启动 || 
+| gggspider.commands.run_multiprocess.py | 多进程方式启动 || 
+| gggspider.commands.run_multiprocess.sh | 多进程方式启动 ||
 
 可选参数有：
 
-|         参数          |    功能     |                 默认值                 |说明|
-|:-------------------:|:---------:|:-----------------------------------:|:---:|
-|     service_url     |   任务接口    | http://127.0.0.1:5555/crawler/tasks ||
-|     spider_name     |   采集器名    |                空字符串                 ||
-|        count        |    数量     |                  1                  ||
-|        mixed        |  是否支持混合   |                False                ||
-|       memory        | 最大使用内存阈值  |                 60                  ||
-|         cpu         | 最大使用cpu阈值 |                 60                  ||
+|              参数              |    功能     |                 默认值                 |        说明        |
+|:----------------------------:|:---------:|:-----------------------------------:|:----------------:|
+|         service_url          |   任务接口    | http://127.0.0.1:5555/crawler/tasks ||
+|         spider_name          |   采集器名    |                空字符串                 ||
+|            count             |    数量     |                  1                  ||
+|         spider_count         |   采集器数量   |                  1                  | 即混合任务时获取多少采集器的任务 |
+|            mixed             |  是否支持混合   |                False                ||
+|            memory            | 最大使用内存阈值  |                 60                  ||
+|             cpu              | 最大使用cpu阈值 |                 60                  ||
+|           forever            | 是否持续获取任务  |                False                ||
 
 ## 部署方案
 
-物理机部署
+**物理机部署**
 
 + 单机部署
 
@@ -215,9 +218,9 @@ def tasks():
 
 + 多机部署
 
-+ 可利用批量工具（如ansible）进行批量指定启动脚本。
+可利用批量工具（如ansible）进行批量指定启动脚本。
 
-容器集群部署
+**容器集群部署**
 
 + 环境镜像+源码
 
@@ -228,6 +231,47 @@ def tasks():
 将源码和环境打包成镜像再启动。
 
 # Manager模式
+
+在采集过程中，有一些零散的、数据量少、任务少的采集平台需求（如小新闻网站）， 这时在采集节点拿到任务时也会整体启动一次项目，这时采集的收益是非常小的
+（启动运行代价和采集数据量比例），这时针对这种情况，设计出Manager模式，
+即利用Manager来管理多个采集器，也就是只启动一个Manager（本质是Spider），
+然后由Manager根据进行代理分发对应Staff采集器里处理逻辑，当然直接执行Staff采集器也是可以的。
+
+manager模式实现步骤：
+
+settings配置
+
+```python
+STAFF_PREFIX = "staff"  # 默认为staff，文件名规范写法为：STAFF_PREFIX+_平台名.py
+STAFF_DEFAULT_LOAD = False  # 默认是否加载staff文件，为False时不支持单独调用staff采集器
+
+```
+
+项目示例：
+
+目录结构：
+```
+
+
+```
+
+代码实现
+```python
+
+# manager.py
+
+
+# staff_spider1.py
+
+# staff_spider2.py
+
+```
+
+服务示例
+```python
+
+
+```
 
 # 多版本共存
 

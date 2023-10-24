@@ -53,6 +53,8 @@ class TasksView(views.MethodView):
     def get(self):
         spider_name = request.args.get('spider_name') or 'test'
         count = request.args.get('count') or 1
+        spider_count = request.args.get('spider_count') or 1
+        mixed = request.args.get('mixed') or False
         return {
             'status': 1,
             'data': [
