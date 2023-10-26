@@ -66,7 +66,7 @@ class TestSpider(Spider):
 from gggspider.commands import run
 
 
-def get_task(spider_name, count, spider_count, mixed):
+def get_tasks(spider_name, count, spider_count, mixed):
     return [{
         'id': '1',
         'spiderName': 'test',
@@ -76,7 +76,7 @@ def get_task(spider_name, count, spider_count, mixed):
     }]
 
 
-run.run(get_tasks_func=get_task)
+run.run(get_tasks_func=get_tasks)
 ```
 
 + __启动__

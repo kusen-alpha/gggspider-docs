@@ -244,31 +244,94 @@ settings配置
 ```python
 STAFF_PREFIX = "staff"  # 默认为staff，文件名规范写法为：STAFF_PREFIX+_平台名.py
 STAFF_DEFAULT_LOAD = False  # 默认是否加载staff文件，为False时不支持单独调用staff采集器
+SPIDER_LOADER_CLASS = 'gggspider.spiderloader.SpiderLoader'
 
 ```
 
 项目示例：
 
 目录结构：
+
 ```
+├─spiders
+    │  │  __init__.py
+    │  │
+    │  ├─test
+    │  │  │  manager.py
+    │  │  │  staff_spider1.py
+    │  │  │  staff_spider2.py
+    │  │  │  __init__.py
 
 
 ```
 
 代码实现
+
 ```python
 
 # manager.py
+from gggspider.spiders import manager
+
+
+class ManagerSpider(manager.ManagerSpider):
+    name = 'test/manager'
 
 
 # staff_spider1.py
+from gggspider.spiders import Spider
+from gggspider.task import attach_task
+
+
+class StaffSpider1(Spider):
+    name = 'test/spider1'
+
+    @attach_task
+    def parse(self, response, **kwargs):
+        print('response1', response)
+
 
 # staff_spider2.py
+from gggspider.spiders import Spider
+from gggspider.task import attach_task
 
+
+class StaffSpider1(Spider):
+    name = 'test/spider2'
+
+    @attach_task
+    def parse(self, response, **kwargs):
+        print('response2', response)
 ```
 
-服务示例
+任务示例
+
 ```python
+from gggspider.commands import run
+
+
+def get_tasks(spider_name, count, spider_count, mixed):
+    return [
+        {
+            "id": "1",
+            "spiderName": "test/spider1",
+            "spiderManagerName": "test/manager",
+            "seed": {
+                "startUrl": "https://www.baidu.com"
+            }
+        },
+        {
+            "id": "2",
+            "spiderName": "test/spider2",
+            "spiderManagerName": "test/manager",
+            "seed": {
+                "startUrl": "https://www.jd.com"
+            }
+        }
+    ]
+
+
+if __name__ == '__main__':
+    run.run(get_tasks_func=get_tasks)
 
 
 ```
