@@ -239,7 +239,7 @@ def tasks():
 
 manager模式实现步骤：
 
-settings配置
+项目配置
 
 ```python
 STAFF_PREFIX = "staff"  # 默认为staff，文件名规范写法为：STAFF_PREFIX+_平台名.py
@@ -337,6 +337,34 @@ if __name__ == '__main__':
 ```
 
 # 多版本共存
+
+对于一些大的采集站点，可能有很多种采集方式，比如PC/API/APP等不同平台方式采集、
+基于刷新用户/刷新板块/id等采集方式采集，这种情况下，一个采集站点就会有很多版本的采集代码，这时在
+下发任务时需要明确指定用哪种采集器进行采集，并且有些时候需要多种版本采集协同完成（比如优先的采集方案不能采集，
+需要用其他采集方式进行补充采集），这时就需要采集里实现多版本之间的自动切换（通过子任务或者修改任务里的 采集版本进行重新下发）。
+
+## 配置项目
+
+```python
+VERSION_PREFIX = "version"
+
+"""
+默认为version，文件名规范写法为：
+1、VERSION_PREFIX+_平台名_+spiderVersion.py
+2、平台名/VERSION_PREFIX_spiderVersion.py
+3、平台名/VERSION_PREFIX_spiderVersion/平台名.py
+
+"""
+
+SPIDER_LOADER_CLASS = 'gggspider.spiderloader.SpiderLoader'
+
+```
+
+## 目录设计
+
+## 任务示例
+
+## 版本切换
 
 # 请求前置/后置处理
 
