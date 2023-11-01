@@ -235,22 +235,21 @@ def tasks():
 在采集过程中，有一些零散的、数据量少、任务少的采集平台需求（如小新闻网站）， 这时在采集节点拿到任务时也会整体启动一次项目，这时采集的收益是非常小的
 （启动运行代价和采集数据量比例），这时针对这种情况，设计出Manager模式，
 即利用Manager来管理多个采集器，也就是只启动一个Manager（本质是Spider），
-然后由Manager根据进行代理分发对应Staff采集器里处理逻辑，当然直接执行Staff采集器也是可以的。
+然后由Manager根据进行代理分发对应Staff采集器里处理逻辑。
 
 manager模式实现步骤：
 
-项目配置
+## 项目配置
 
 ```python
 STAFF_PREFIX = "staff"  # 默认为staff，文件名规范写法为：STAFF_PREFIX+_平台名.py
-STAFF_DEFAULT_LOAD = False  # 默认是否加载staff文件，为False时不支持单独调用staff采集器
 SPIDER_LOADER_CLASS = 'gggspider.spiderloader.SpiderLoader'
 
 ```
 
-项目示例：
+## 项目示例
 
-目录结构：
++ 目录结构
 
 ```
 ├─spiders
@@ -265,7 +264,7 @@ SPIDER_LOADER_CLASS = 'gggspider.spiderloader.SpiderLoader'
 
 ```
 
-代码实现
++ 代码实现
 
 ```python
 
@@ -303,7 +302,7 @@ class StaffSpider1(Spider):
         print('response2', response)
 ```
 
-任务示例
+## 任务示例
 
 ```python
 from gggspider.commands import run
@@ -349,7 +348,7 @@ if __name__ == '__main__':
 VERSION_PREFIX = "version"
 
 """
-默认为version，文件名规范写法为：
+默认为version，文件名规范写法为下列三种中其中一种：
 1、VERSION_PREFIX+_平台名_+spiderVersion.py
 2、平台名/VERSION_PREFIX_spiderVersion.py
 3、平台名/VERSION_PREFIX_spiderVersion/平台名.py
@@ -360,11 +359,111 @@ SPIDER_LOADER_CLASS = 'gggspider.spiderloader.SpiderLoader'
 
 ```
 
-## 目录设计
+## 项目示例
+
++ 目录结构
+
+```
+├─spiders
+│  │  test.py
+│  │  version_test_v1.py
+│  │  version_test_v2.py
+│  │  __init__.py
+
+```
+
++ 代码实现
+
+```python
+# test.py
+import scrapy
+from gggspider import Spider
+from gggspider.task import attach_task
+
+
+class TestSpider(Spider):
+    name = "test"
+
+    def parse(self, response):
+        print("default", response)
+
+
+# version_test_v1.py
+import scrapy
+from gggspider import Spider
+from gggspider.task import attach_task
+
+
+class TestSpider(Spider):
+    name = "test"
+
+    def parse(self, response):
+        print("v1", response)
+
+
+# version_test_v2.py
+import scrapy
+from gggspider import Spider
+from gggspider.task import attach_task
+
+
+class TestSpider(Spider):
+    name = "test"
+
+    def parse(self, response):
+        print("v2", response)
+
+```
 
 ## 任务示例
 
+```python
+from gggspider.commands import run
+
+
+def get_tasks(spider_name, count, spider_count, mixed):
+    return [
+
+        {
+            "id": "1",
+            "spiderName": "test",
+            "seed": {
+                "startUrl": "https://www.baidu.com"
+            }
+        },
+        {
+            "id": "2",
+            "spiderName": "test",
+            "spiderVersion": "v1",
+            "seed": {
+                "startUrl": "https://www.jd.com"
+            }
+        },
+        {
+            "id": "3",
+            "spiderName": "test",
+            "spiderVersion": "v2",
+            "seed": {
+                "startUrl": "https://www.taobao.com"
+            }
+        }
+    ]
+
+
+if __name__ == '__main__':
+    run.run(get_tasks_func=get_tasks)
+
+```
+
 ## 版本切换
+
+当一个采集平台有多个版本，面临着多版本协同完成采集目录，如果版本信息是在下发任务时就已经能明确的情况下，
+直接在任务里进行指定，但是如果在采集过程中，当前版本未能达到采集目录，需要切换其他版本进行完成采集工作时，
+可通过子任务的方式进行将版本名切换，这时需要用到任务相关服务进行操作，采集里进行子任务的发起即可：
+
+```python
+# 待测试......
+```
 
 # 请求前置/后置处理
 
