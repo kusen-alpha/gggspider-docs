@@ -469,7 +469,58 @@ if __name__ == '__main__':
 
 ## 数据治理
 
+如果业务层对采集推送的数据有一定的要求，比如字段类型校验、默认值补全、数据格式校验等有要求时，
+可以在采集层面进行有些初步治理。
+
+gggspider里利用scapy和gggifcheck能完成这些简单的治理工作，示例:
+
+```python
+# items.py
+import scrapy
+from gggspider.items import DataItem
+from gggifcheck import fields
+
+
+class TestDataItem(DataItem):
+    # 治理操作可以参考gggifcheck
+    id = scrapy.Field(check_filed=fields.IntegerCheckField(nullable=False))
+    author = scrapy.Field(check_filed=fields.StringCheckField(default="张三"))
+    content = scrapy.Field(check_filed=fields.StringCheckField())
+    
+# spider
+
+import scrapy
+from gggspider import Spider
+from gggspider.task import attach_task
+from xxx.items import TestDataItem
+
+
+class TestSpider(Spider):
+    name = "test"
+
+    @attach_task
+    def start_request(self, task):
+        yield scrapy.Request(url=task['seed']['startUrl'])
+
+    @attach_task
+    def parse(self, response):
+        item = TestDataItem()
+        item['id'] = 1
+        item['content'] = "test"
+```
+
+settings配置CheckPipeline进行治理生效:
+
+```python
+# settings.py
+ITEM_PIPELINES = {
+   "gggspider.pipelines.check.CheckPipeline": 100,
+   # "gggspider.pipelines.show.ShowPipeline": 101, # 打印
+}
+```
 ## 数据透传
+
+## 数据推送
 
 ## 数据备份
 
