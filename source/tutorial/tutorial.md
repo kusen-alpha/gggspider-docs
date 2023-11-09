@@ -66,7 +66,7 @@ class TasksView(views.MethodView):
                         'startUrl': 'http://127.0.0.1:5555/crawler/crawl_dst/list',
                         'persists': {
                             'file': {'path': './'}  # 本地持久化,
-                            'interface': {'url': 'http://127.0.0.1:5555/crawler/data/persist'} # 接口持久化
+                            'interface': {'url': 'http://127.0.0.1:5555/crawler/persist/datas'} # 接口持久化
                         }
                     }
                 }
@@ -101,9 +101,9 @@ app.add_url_rule(
 + __数据推送接口__
 
 ```python
-class DataPersist(views.MethodView):
+class DatasPersist(views.MethodView):
     def post(self):
-        items = request.json()
+        items = request.json
         print(items)
         return {
             'status': 1,
@@ -111,6 +111,8 @@ class DataPersist(views.MethodView):
             'message': 'success'
         }
 
+app.add_url_rule(
+    '/crawler/persist/datas', view_func=DatasPersist.as_view('persist_datas'))
 ```
 
 # 项目准备

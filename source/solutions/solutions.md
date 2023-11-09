@@ -469,8 +469,7 @@ if __name__ == '__main__':
 
 ## 数据治理
 
-如果业务层对采集推送的数据有一定的要求，比如字段类型校验、默认值补全、数据格式校验等有要求时，
-可以在采集层面进行有些初步治理。
+如果业务层对采集推送的数据有一定的要求，比如字段类型校验、默认值补全、数据格式校验等有要求时， 可以在采集层面进行有些初步治理。
 
 gggspider里利用scapy和gggifcheck能完成这些简单的治理工作，示例:
 
@@ -486,7 +485,8 @@ class TestDataItem(DataItem):
     id = scrapy.Field(check_filed=fields.IntegerCheckField(nullable=False))
     author = scrapy.Field(check_filed=fields.StringCheckField(default="张三"))
     content = scrapy.Field(check_filed=fields.StringCheckField())
-    
+
+
 # spider
 
 import scrapy
@@ -514,17 +514,246 @@ settings配置CheckPipeline进行治理生效:
 ```python
 # settings.py
 ITEM_PIPELINES = {
-   "gggspider.pipelines.check.CheckPipeline": 100,
-   # "gggspider.pipelines.show.ShowPipeline": 101, # 打印
+    "gggspider.pipelines.check.CheckPipeline": 100,
+    # "gggspider.pipelines.show.ShowPipeline": 101, # 打印
 }
 ```
+
 ## 数据透传
+
+在采集数据推送时，有部分数据是通过任务里携带的，包括一些和采集平台相关的以及一些
+业务变动临时附加的，这时在采集中手动指定从任务里获取或在Pipeline进行统一获取。
+
+采集里获取示例:
+
+```python
+
+# 解析处示例
+@attach_task
+def parse(self, response):
+    seed = response.meta['task']['seed']
+    item = TestDataItem()
+    item['site_name'] = seed.get('siteName')
+```
+
+在Pipeline里处理示例：
+
+```python
+# pipeline处处理
+
+def process_item(self, item, spider):
+    task = spider.tasks[item['_tid']]
+    seed = task['seed']
+    item['site_name'] = seed.get('siteName')
+    return item
+```
 
 ## 数据推送
 
+在gggspider里，默认推荐使用统一数据推送服务接口，来完成批量和统一处理逻辑。
+
+如果需要直接连接数据库等相关逻辑，可以自定义进行完成相关pipeline逻辑。
+
+搭建示例：
+
+```python
+
+import scrapy
+from gggspider import Spider
+from gggspider.task import attach_task
+from xxx.items import TestDataItem
+
+
+class TestSpider(Spider):
+    name = "test"
+
+    @attach_task
+    def start_request(self, task):
+        yield scrapy.Request(url=task['seed']['startUrl'])
+
+    @attach_task
+    def parse(self, response):
+        item = TestDataItem()
+        item['id'] = 1
+        item['author'] = "author"
+        item['content'] = "content"
+        yield item
+```
+
+推送接口服务:
+
+```python
+from flask import Flask, views, request
+
+
+class DatasPersist(views.MethodView):
+
+    def post(self):
+        items = request.json
+        print(items)
+        # TODO 进行持久化处理
+        return {
+            'status': 1,
+            'data': None,
+            'message': 'success'
+        }
+
+
+app.add_url_rule('/crawler/persist/datas',
+                 view_func=DatasPersist.as_view(name='persist_datas'))
+```
+
+采集配置:
+
+```
+# settings.py
+
+ITEM_PIPELINES = {
+   "gggspider.pipelines.check.CheckPipeline": 100,
+   "gggspider.pipelines.persists.datas.interface.PersistPipeline": 101,
+}
+DATAS_INTERFACE_PERSIST_URL = "http://127.0.0.1:5555/crawler/persist/datas"
+DATAS_INTERFACE_PERSIST_CLASSIFIED = True  # 是否分类推送
+DATAS_INTERFACE_PERSIST_MAXSIZE = 1  # 批量推送单次最大数量
+```
+
 ## 数据备份
 
+数据备份接口服务:
+
+```python
+from flask import Flask, views, request
+
+
+class BackupDatasPersist(views.MethodView):
+
+    def get(self):
+        _id = request.args.get('id')
+        _type = request.args.get('type')
+        # TODO 获取备份的数据进行续传
+        return {
+            'status': 1,
+            'data': [{
+                'id': '1',
+                'author': 'author',
+                'content': 'content'
+            }],
+            'message': 'success'
+        }
+
+    def post(self):
+        items = request.json
+        print(items)
+        # TODO 进行持久化处理且生成任务到任务队列(续传也通过任务方式流转)
+        return {
+            'status': 1,
+            'data': None,
+            'message': 'success'
+        }
+
+
+app.add_url_rule('/crawler/persist/backup_datas',
+                 view_func=BackupDatasPersist.as_view(
+                     name='persist_backup_datas'))
+```
+
+采集配置:
+
+```
+# settings.py
+
+ITEM_PIPELINES = {
+   "gggspider.pipelines.persists.datas.interface.BackupPersistPipeline": 102
+}
+DATAS_BACKUP_INTERFACE_PERSIST_URL = "http://127.0.0.1:5555/crawler/persist/backup_datas"
+DATAS_BACKUP_INTERFACE_PERSIST_MAXSIZE = True  # 是否分类推送
+DATAS_BACKUP_INTERFACE_PERSIST_CLASSIFIED = 1  # 批量推送单次最大数量
+```
+
 ## 数据续传
+
+数据续传是将备份的数据重新进行推送，通过接口获取，这时可以抽象为一个采集器进行采集 通过任务的方式进行获取备份数据。
+
+数据续传采集器：
+
+```python
+import json
+
+import scrapy
+from gggspider import Spider
+from gggspider.task import attach_task
+from gggspider.items import DataRetransmissionItem
+
+
+class DatasRetransmissionSpider(Spider):
+    name = "datas/retransmission"
+
+    @attach_task
+    def start_request(self, task):
+        yield scrapy.Request(url=task['seed']['startUrl'])
+
+    @attach_task
+    def parse(self, response):
+        datas = json.loads(response.text)['data']
+        for data in datas:
+            item = DataRetransmissionItem()
+            item['data'] = data
+            item['_type'] = data.get('_type', '')
+            yield item
+```
+
+任务服务示例：
+
+```python
+class BackupDatasPersist(views.MethodView):
+
+    def get(self):
+        ids = request.args.get('ids')
+        _type = request.args.get('type')
+        return {
+            'status': 1,
+            'data': [{
+                '_tid': '1',
+                '_type': '',
+                'id': '1',
+                'author': 'author',
+                'content': 'content'
+            }],
+            'message': 'success'
+        }
+
+
+app.add_url_rule('/crawler/persist/backup_datas',
+                 view_func=BackupDatasPersist.as_view(
+                     name='persist_backup_datas'))
+```
+
+任务启动示例：
+
+```python
+
+from gggspider.commands import run
+
+
+def get_tasks(spider_name, count, spider_count, mixed):
+    return [
+        {
+            "id": "2",
+            "spiderName": "datas/retransmission",
+            "seed": {
+                "startUrl": "http://127.0.0.1:5555/crawler/persist/backup_datas?ids=1,2",
+                "persistConfigs": {
+                    "interface": {
+                        'url': 'http://127.0.0.1:5555/crawler/persist/datas'}
+                }
+            }
+        },
+    ]
+
+
+if __name__ == '__main__':
+    run.run(get_tasks_func=get_tasks)
+```
 
 # 任务处理
 
