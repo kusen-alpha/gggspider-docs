@@ -30,51 +30,53 @@
 
 ## seed标准
 
-|            字段名            |               功能               | 是否必须 |        类型        |            默认值             |             备注             |
-|:-------------------------:|:------------------------------:|:----:|:----------------:|:--------------------------:|:--------------------------:|
-|            id             |            信源/种子id             |  是   |    string/int    |         string/int         ||
-|          channel          |              通道号               |  否   |       int        |||
-|          siteId           |              网站id              |  否   |    string/int    |||
-|         siteName          |              网站名称              |  否   |      string      |||
-|         boardType         |              板块类别              |  否   |      string      |||
-|          boardId          |              板块id              |  否   |    string/int    |||
-|       customBoardId       |            自定义板块id             |  否   |    string/int    |||
-|         boardName         |              板块名称              |  否   |      string      |||
-|       subBoardName        |             子板块名称              |  否   |      string      |||
-|         boardUrl          |             板块url              |  否   |      string      |||
-|         startUrl          |             起始url              |  是   |      string      |||=
-|       requestKwargs       |             起始请求参数             |  否   | object(map/dict) |||
-|         fileUrls          |            文件url列表             |  否   |      array       |||
-|         filePaths         |         文件url对应存储路径列表          |  否   |      array       |||
-|          appends          |             透传其他参数             |  否   | object(map/dict) |||
-|         encoding          |               编码               |  否   |      string      |||
-|         language          |               语言               |  否   |      string      |||
-|         priority          |              优先级               |  否   |       int        |||
-|         location          |               地区               |  否   |      string      |||
-|          domain           |               域名               |  否   |      string      |||
-|       customDomain        |             自定义域名              |  否   |      string      |||
-|       allowDomains        |             允许域名列表             |  否   |      array       |||
-|        timeFormats        |            时间解析格式列表            |  否   |      array       |||
-|        crawlTypes         |             爬取类别列表             |  否   |      array       |||
-|       crawlPageNum        |              爬取页码              |  否   |       int        |||
-|        crawlCount         |              爬取数量              |  否   |       int        |||
-|        crawlDepth         |              爬取深度              |  否   |       int        |||
-|        retryCount         |              重试次数              |  否   |       int        |||
-|           delay           |              请求延迟              |  否   |       int        |||
-|          timeout          |             请求超时时间             |  否   |       int        |||
-|         resources         |              资源信息              |  否   | object(map/dict) |||
-|      resourceConfigs      |             资源信息配置             |  否   | object(map/dict) |||
-|       crawlStartTs        |            爬取范围起始时间            |  否   |       int        |||
-|        crawlEndTs         |            爬取范围结束时间            |  否   |       int        |||
-|     multimediaMarkup      |          文本是否进行多媒体标记           |  否   |     boolean      |||
-| multimediaDownloadUnified | 是否使用统一下载 |  否   |        boolean          || 统一下载时将spiderName取为默认Spider |
-|    multimediaDownload     |           多媒体是否下载配置            |  否   | object(map/dict) |||
-|       parseConfigs        |             解析规则配置             |  否   | object(map/dict) |||
-|       persistConfigs        |             持久化配置              |  否   | object(map/dict) |||
-|       spreadEabled        |            是否开启多级传播            |  否   |     boolean      |||
-|       spreadBasis        |             多级传播基准             |  否   |      array       |||
-|       spreadBasisSourceTypes        |           多级传播基准来源类别           |  否   |      array       |||
-|       spreadCrawlTypes        |           多级传播采集的类型            |  否   |      array       |||
+|            字段名            |      功能       | 是否必须 |        类型        |            默认值             |             备注             |
+|:-------------------------:|:-------------:|:----:|:----------------:|:--------------------------:|:--------------------------:|
+|            id             |    信源/种子id    |  是   |    string/int    |         string/int         ||
+|          channel          |      通道号      |  否   |       int        |||
+|          siteId           |     网站id      |  否   |    string/int    |||
+|         siteName          |     网站名称      |  否   |      string      |||
+|         boardType         |     板块类别      |  否   |      string      |||
+|          boardId          |     板块id      |  否   |    string/int    |||
+|       customBoardId       |    自定义板块id    |  否   |    string/int    |||
+|         boardName         |     板块名称      |  否   |      string      |||
+|       subBoardName        |     子板块名称     |  否   |      string      |||
+|         boardUrl          |     板块url     |  否   |      string      |||
+|         startUrl          |     起始url     |  是   |      string      |||=
+|       requestKwargs       |    起始请求参数     |  否   | object(map/dict) |||
+|         fileUrls          |    文件url列表    |  否   |      array       |||
+|         filePaths         | 文件url对应存储路径列表 |  否   |      array       |||
+|          appends          |    透传其他参数     |  否   | object(map/dict) |||
+|         encoding          |      编码       |  否   |      string      |||
+|         language          |      语言       |  否   |      string      |||
+|         priority          |      优先级      |  否   |       int        |||
+|         location          |      地区       |  否   |      string      |||
+|          domain           |      域名       |  否   |      string      |||
+|       customDomain        |     自定义域名     |  否   |      string      |||
+|       allowDomains        |    允许域名列表     |  否   |      array       |||
+|        timeFormats        |   时间解析格式列表    |  否   |      array       |||
+|        crawlTypes         |    爬取类别列表     |  否   |      array       |||
+|       crawlPageNum        |     爬取页码      |  否   |       int        ||    一般给不设置起始页码时从首页依次翻页所用    |
+|      crawlStartPage       |    爬取开始页码     |  否   |       int        |||
+|       crawlEndPage        |    爬取结束页码     |  否   |       int        |||
+|        crawlCount         |     爬取数量      |  否   |       int        |||
+|        crawlDepth         |     爬取深度      |  否   |       int        |||
+|        retryCount         |     重试次数      |  否   |       int        |||
+|           delay           |     请求延迟      |  否   |       int        |||
+|          timeout          |    请求超时时间     |  否   |       int        |||
+|         resources         |     资源信息      |  否   | object(map/dict) |||
+|      resourceConfigs      |    资源信息配置     |  否   | object(map/dict) |||
+|       crawlStartTs        |   爬取范围起始时间    |  否   |       int        |||
+|        crawlEndTs         |   爬取范围结束时间    |  否   |       int        |||
+|     multimediaMarkup      |  文本是否进行多媒体标记  |  否   |     boolean      |||
+| multimediaDownloadUnified |   是否使用统一下载    |  否   |        boolean          || 统一下载时将spiderName取为默认Spider |
+|    multimediaDownload     |   多媒体是否下载配置   |  否   | object(map/dict) |||
+|       parseConfigs        |    解析规则配置     |  否   | object(map/dict) |||
+|      persistConfigs       |     持久化配置     |  否   | object(map/dict) |||
+|       spreadEabled        |   是否开启多级传播    |  否   |     boolean      |||
+|        spreadBasis        |    多级传播基准     |  否   |      array       |||
+|  spreadBasisSourceTypes   |  多级传播基准来源类别   |  否   |      array       |||
+|     spreadCrawlTypes      |   多级传播采集的类型   |  否   |      array       |||
 
 + __requestKwargs__
 
